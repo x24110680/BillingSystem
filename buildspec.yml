@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.13
+    commands:
+      - source myenv/bin/activate
+      - pip install -r requirements.txt
+      - pip install pylint
+  pre_build:
+    commands:
+      - echo Running static code analysis...
+  build:
+    commands:
+      - pylint --exit-zero application.py
+artifacts:
+  files:
+    - application.py
+  discard-paths: yes
