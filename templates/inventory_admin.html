@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Admin Inventory Dashboard</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background-color: #2d3e50;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            flex-wrap: wrap;
+        }
+
+        .navbar a {
+            color: white;
+            margin-left: 20px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1000px;
+            margin: auto;
+            flex: 1;
+        }
+
+        h2 {
+            color: #2d3e50;
+        }
+
+        h3 {
+            color: #3a4e73;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        input[type="text"], input[type="number"], input[type="submit"] {
+            padding: 8px 12px;
+            margin: 8px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f0f4f8;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f9fbfd;
+        }
+
+        .actions a {
+            color: #e74c3c;
+            margin-left: 10px;
+        }
+
+        .actions a:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            background-color: #2d3e50;
+            color: white;
+            text-align: center;
+            padding: 10px 15px;
+            width: 100%;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        @media (max-width: 768px) {
+            table, th, td {
+                font-size: 14px;
+            }
+
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .navbar a {
+                margin: 5px 0;
+            }
+
+            form input[type="submit"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div>
+            <strong>Admin Dashboard</strong>
+        </div>
+        <div>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>Admin Inventory Dashboard</h2>
+
+        <h3>Add New Item</h3>
+        <form method="POST" action="{{ url_for('add_item') }}">
+            <label>Name:</label>
+            <input type="text" name="name" required>
+
+            <label>Quantity:</label>
+            <input type="number" name="quantity" required>
+
+            <label>Price:</label>
+            <input type="number" step="0.01" name="price" required>
+
+            <input type="submit" value="Add Item">
+        </form>
+
+        <h3>Current Inventory</h3>
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Actions</th>
+            </tr>
+            {% for item in items %}
+            <tr>
+                <form method="POST" action="{{ url_for('update_item', item_id=item[0]) }}">
+                    <td>{{ item[0] }}</td>
+                    <td><input type="text" name="name" value="{{ item[1] }}"></td>
+                    <td><input type="number" name="quantity" value="{{ item[2] }}"></td>
+                    <td><input type="number" step="0.01" name="price" value="{{ item[3] }}"></td>
+                    <td class="actions">
+                        <input type="submit" value="Update">
+                        <a href="{{ url_for('delete_item', item_id=item[0]) }}" onclick="return confirm('Delete this item?')">Delete</a>
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p style="color:green;">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <footer>
+        &copy; {{ now().year if now else '2025' }} Inventory Billing System. All rights reserved.
+    </footer>
+
+</body>
+</html>
